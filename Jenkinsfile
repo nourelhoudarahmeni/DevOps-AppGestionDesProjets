@@ -11,16 +11,30 @@ pipeline {
 
         stage('Tests unitaires') {
             steps {
-                dir('backend') {
-                    bat 'mvn -B test'
+                withEnv([
+                    'JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.16.8-hotspot',
+                    'PATH+JDK=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.16.8-hotspot\\bin',
+                    'PATH+MAVEN=C:\\Users\\nawres\\apache-maven-3.9.14\\bin'
+                ]) {
+                    dir('backend') {
+                        bat 'java -version'
+                        bat 'mvn -version'
+                        bat 'mvn -B test'
+                    }
                 }
             }
         }
 
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    bat 'mvn -B package -DskipTests'
+                withEnv([
+                    'JAVA_HOME=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.16.8-hotspot',
+                    'PATH+JDK=C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.16.8-hotspot\\bin',
+                    'PATH+MAVEN=C:\\Users\\nawres\\apache-maven-3.9.14\\bin'
+                ]) {
+                    dir('backend') {
+                        bat 'mvn -B package -DskipTests'
+                    }
                 }
             }
         }
@@ -28,7 +42,8 @@ pipeline {
 
     post {
         always {
-            junit 'backend/target/surefire-reports/*.xml'
+            junit allowEmptyResults: true,
+                  testResults: 'backend/target/surefire-reports/*.xml'
         }
     }
 }
